@@ -22,7 +22,9 @@ public interface WardrobeContract {
 
         void changeFavouriteState(@DrawableRes int resourceId);
 
+        void showPlaceholderForShirt(ImageModel placeholderModel);
 
+        void showPlaceholderForPant(ImageModel placeholderModel);
     }
 
     interface WardrobePresenter {

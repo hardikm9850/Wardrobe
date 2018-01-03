@@ -2,18 +2,15 @@ package com.wardrobe.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
-import android.support.v7.widget.CardView;
+import android.support.v7.widget.AppCompatTextView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 
 import com.glidebitmappool.GlideBitmapFactory;
 import com.wardrobe.R;
@@ -33,6 +30,8 @@ public class ImageAdapter extends PagerAdapter {
 
     @BindView(R.id.img_cloth)
     ImageView imgCloth;
+    @BindView(R.id.txt_placeholder)
+    AppCompatTextView txtPlaceholder;
 
     private ArrayList<ImageModel> imageModels;
     private Context context;
@@ -43,8 +42,20 @@ public class ImageAdapter extends PagerAdapter {
     }
 
     public void setData(ArrayList<ImageModel> _imageModels) {
+        this.imageModels.clear();
         this.imageModels = _imageModels;
         notifyDataSetChanged();
+    }
+
+
+    public void setData(ImageModel _imageModel) {
+        this.imageModels.add(_imageModel);
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+        return POSITION_NONE;
     }
 
     @Override
@@ -71,6 +82,12 @@ public class ImageAdapter extends PagerAdapter {
         View view = LayoutInflater.from(context).inflate(R.layout.layout_image_container, container, false);
         ButterKnife.bind(this, view);
         String path = imageModels.get(position).getImagePath();
+        if (path == null) {
+            txtPlaceholder.setVisibility(View.VISIBLE);
+            container.addView(view, 0);
+            return view;
+        }
+
         File file = new File(path);
         if (!file.exists()) {
             imgCloth.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.pant));

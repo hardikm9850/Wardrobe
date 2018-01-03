@@ -122,11 +122,14 @@ public class MainActivity extends AppCompatActivity implements WardrobeContract.
         imgFavourite.setBackgroundDrawable(drawable);
     }
 
+    @Override
+    public void showPlaceholderForShirt(ImageModel placeholderModel) {
+        shirtAdapter.setData(placeholderModel);
+    }
 
-    public void checkFirstCombination() {
-        int currentPantItemPosition = viewpagerPant.getCurrentItem();
-        int currentShirtItemPosition = viewpagerShirt.getCurrentItem();
-        checkIfCombinationIsFavourite(currentShirtItemPosition, currentPantItemPosition);
+    @Override
+    public void showPlaceholderForPant(ImageModel placeholderModel) {
+        pantAdapter.setData(placeholderModel);
     }
 
     @OnClick({R.id.img_add_shirt, R.id.img_add_pant, R.id.img_favourite})
