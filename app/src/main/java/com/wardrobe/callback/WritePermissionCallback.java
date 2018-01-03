@@ -20,12 +20,10 @@ import pl.tajchert.nammu.PermissionCallback;
 public class WritePermissionCallback implements PermissionCallback {
 
     private WeakReference<Activity> activityWeakReference;
-    private boolean multipleSupported;
     private int selectionLimit;
 
-    public WritePermissionCallback(Activity activity, boolean isMultipleSupported, int selectionLimit) {
+    public WritePermissionCallback(Activity activity, int selectionLimit) {
         activityWeakReference = new WeakReference<>(activity);
-        this.multipleSupported = isMultipleSupported;
         this.selectionLimit = selectionLimit;
     }
 

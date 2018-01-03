@@ -22,4 +22,22 @@ public class FavouriteTable extends BaseModel {
         this.shirtId = shirtId;
         this.pantId = pantId;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        FavouriteTable that = (FavouriteTable) o;
+        if (shirtId != that.shirtId) return false;
+        return pantId == that.pantId;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + shirtId;
+        result = 31 * result + pantId;
+        return result;
+    }
 }

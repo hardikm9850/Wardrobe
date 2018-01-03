@@ -2,16 +2,18 @@ package com.wardrobe.view;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.IntegerRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageButton;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 
 import com.darsh.multipleimageselect.helpers.Constants;
 import com.darsh.multipleimageselect.models.Image;
@@ -114,6 +116,19 @@ public class MainActivity extends AppCompatActivity implements WardrobeContract.
         pantAdapter.setData(imageModels);
     }
 
+    @Override
+    public void changeFavouriteState(@IntegerRes int resource) {
+        Drawable drawable = ContextCompat.getDrawable(context, resource);
+        imgFavourite.setBackgroundDrawable(drawable);
+    }
+
+
+    public void checkFirstCombination() {
+        int currentPantItemPosition = viewpagerPant.getCurrentItem();
+        int currentShirtItemPosition = viewpagerShirt.getCurrentItem();
+        checkIfCombinationIsFavourite(currentShirtItemPosition, currentPantItemPosition);
+    }
+
     @OnClick({R.id.img_add_shirt, R.id.img_add_pant, R.id.img_favourite})
     public void onClick(View view) {
         switch (view.getId()) {
@@ -126,24 +141,31 @@ public class MainActivity extends AppCompatActivity implements WardrobeContract.
             }
             break;
             case R.id.img_favourite: {
-                //TODO Get id of current item id of from both viewpager
                 int currentShirtItem = viewpagerShirt.getCurrentItem();
                 int currentPantItem = viewpagerPant.getCurrentItem();
                 ImageModel shirtModel = shirtAdapter.getItemAtPosition(currentShirtItem);
                 ImageModel pantModel = pantAdapter.getItemAtPosition(currentPantItem);
-                wardrobePresenter.storeFavouriteItem(shirtModel, pantModel);
+                wardrobePresenter.addToFavourites(shirtModel, pantModel);
             }
             break;
         }
     }
 
     @OnPageChange(value = R.id.viewpager_shirt, callback = PAGE_SELECTED)
-    public void onShirtChangeListener(int shirtPosition) {
-
+    public void onShirtChangeListener(int currentShirtItemPosition) {
+        int currentPantItemPosition = viewpagerPant.getCurrentItem();
+        checkIfCombinationIsFavourite(currentShirtItemPosition, currentPantItemPosition);
     }
 
     @OnPageChange(value = R.id.viewpager_pant, callback = PAGE_SELECTED)
-    public void onPantChangeListener(int pantPosition) {
+    public void onPantChangeListener(int currentPantItemPosition) {
+        int currentShirtItemPosition = viewpagerShirt.getCurrentItem();
+        checkIfCombinationIsFavourite(currentShirtItemPosition, currentPantItemPosition);
+    }
 
+    private void checkIfCombinationIsFavourite(int currentShirtItemPosition, int currentPantItemPosition) {
+        ImageModel pantModel = pantAdapter.getItemAtPosition(currentPantItemPosition);
+        ImageModel shirtModel = shirtAdapter.getItemAtPosition(currentShirtItemPosition);
+        wardrobePresenter.onPageChanged(shirtModel, pantModel);
     }
 }

@@ -1,5 +1,8 @@
 package com.wardrobe.contract;
 
+import android.support.annotation.DrawableRes;
+import android.support.annotation.IntegerRes;
+
 import com.darsh.multipleimageselect.models.Image;
 import com.wardrobe.model.ImageModel;
 
@@ -16,6 +19,10 @@ public interface WardrobeContract {
         void setupShirtView(ArrayList<ImageModel> imageModels);
 
         void setupPantView(ArrayList<ImageModel> imageModels);
+
+        void changeFavouriteState(@DrawableRes int resourceId);
+
+
     }
 
     interface WardrobePresenter {
@@ -25,6 +32,8 @@ public interface WardrobeContract {
 
         void storeImages(ArrayList<Image> images, boolean isShirtSelected);
 
-        void storeFavouriteItem(ImageModel shirtModel, ImageModel pantModel);
+        void addToFavourites(ImageModel shirtModel, ImageModel pantModel);
+
+        void onPageChanged(ImageModel shirtModel,ImageModel pantModel);
     }
 }

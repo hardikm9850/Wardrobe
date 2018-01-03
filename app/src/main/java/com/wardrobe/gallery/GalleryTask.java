@@ -20,11 +20,10 @@ import pl.tajchert.nammu.Nammu;
 
 public class GalleryTask {
 
-    private static boolean multipleSupported = true;
-    private static int selectionLimit = 3;
+    private static int SELECTION_LIMIT = 5;
 
     /**
-     * @param activity activity instance
+     * @param activity              activity instance
      * @param cameraUriNameCallback callback that allows stores Uri of camera image
      */
     public static void launchGallaryChooser(final Activity activity, final Callback<Uri> cameraUriNameCallback) {
@@ -57,10 +56,10 @@ public class GalleryTask {
             public void onClick(DialogInterface dialog, int which) {
                 //Ask for Write Media permission
                 if (Nammu.checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    new WritePermissionCallback(activity, multipleSupported, selectionLimit).permissionGranted();
+                    new WritePermissionCallback(activity, SELECTION_LIMIT).permissionGranted();
                     return;
                 }
-                Nammu.askForPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE, new WritePermissionCallback(activity, multipleSupported, selectionLimit));
+                Nammu.askForPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE, new WritePermissionCallback(activity, SELECTION_LIMIT));
             }
         });
     }

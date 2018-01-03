@@ -2,9 +2,11 @@ package com.wardrobe.presenter;
 
 import com.darsh.multipleimageselect.models.Image;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
+import com.wardrobe.R;
 import com.wardrobe.contract.WardrobeContract;
 import com.wardrobe.contract.WardrobeContract.WardrobeView;
 import com.wardrobe.database.FavouriteTable;
+import com.wardrobe.database.FavouriteTable_Table;
 import com.wardrobe.database.WardrobeTable;
 import com.wardrobe.database.WardrobeTable_Table;
 import com.wardrobe.model.ImageModel;
@@ -20,12 +22,17 @@ import java.util.List;
 public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter {
 
     private WardrobeView wardrobeView;
-
+    private List<FavouriteTable> favouriteTableList;
 
     public WardrobePresenterImpl(WardrobeView _wardrobeView) {
         this.wardrobeView = _wardrobeView;
         setDataForViews(true);
         setDataForViews(false);
+        fetchFavourites();
+    }
+
+    private void fetchFavourites() {
+        favouriteTableList = SQLite.select().from(FavouriteTable.class).queryList();
     }
 
     @Override
@@ -58,7 +65,7 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
     }
 
     @Override
-    public void storeFavouriteItem(ImageModel shirtModel, ImageModel pantModel) {
+    public void addToFavourites(ImageModel shirtModel, ImageModel pantModel) {
         if (shirtModel == null || pantModel == null)
             return;
         int shirtId = shirtModel.getImageId();
@@ -66,6 +73,26 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
         FavouriteTable favouriteTable = new FavouriteTable(shirtId, pantId);
         favouriteTable.update();
         favouriteTable.save();
+        favouriteTableList.add(favouriteTable);
+        wardrobeView.changeFavouriteState(R.drawable.ic_like);
+    }
+
+    @Override
+    public void onPageChanged(ImageModel shirtModel, ImageModel pantModel) {
+        if (shirtModel == null)
+            return;
+        if (pantModel == null)
+            return;
+        if (favouriteTableList == null) {
+            favouriteTableList = SQLite.select().from(FavouriteTable.class).queryList();
+        }
+        FavouriteTable favouriteTable = new FavouriteTable(shirtModel.getImageId(), pantModel.getImageId());
+        boolean isCombinationLiked = favouriteTableList.contains(favouriteTable);
+        if (isCombinationLiked) {
+            wardrobeView.changeFavouriteState(R.drawable.ic_like);
+        } else {
+            wardrobeView.changeFavouriteState(R.drawable.ic_dis_like);
+        }
     }
 
     private void setDataForViews(boolean isShirtSelected) {
@@ -87,9 +114,26 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
         }
         if (isShirtSelected) {
             wardrobeView.setupShirtView(imageModels);
-            wardrobeView.setupPantView(imageModels);
-        } else {
-            wardrobeView.setupPantView(imageModels);
+            return;
+        }
+        wardrobeView.setupPantView(imageModels);
+        shouldShowLikedForFirstCombination(imageModels.get(0).getImageId());
+    }
+
+    private void shouldShowLikedForFirstCombination(int pantId) {
+        WardrobeTable wardrobeTable = SQLite.select(WardrobeTable_Table.id).
+                from(WardrobeTable.class).
+                orderBy(WardrobeTable_Table.id.asc()).
+                querySingle();
+        if (wardrobeTable == null)
+            return;
+        int shirtId = wardrobeTable.getId();
+        FavouriteTable favouriteTable = SQLite.select().
+                from(FavouriteTable.class).
+                where(FavouriteTable_Table.shirtId.eq(shirtId)).
+                and(FavouriteTable_Table.pantId.eq(pantId)).querySingle();
+        if (favouriteTable != null) {
+            wardrobeView.changeFavouriteState(R.drawable.ic_like);
         }
     }
 }
