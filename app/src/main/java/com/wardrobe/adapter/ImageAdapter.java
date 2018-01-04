@@ -2,9 +2,12 @@ package com.wardrobe.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.AppCompatTextView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +16,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.glidebitmappool.GlideBitmapFactory;
+import com.glidebitmappool.GlideBitmapPool;
 import com.wardrobe.R;
 import com.wardrobe.model.ImageModel;
 
@@ -92,7 +96,7 @@ public class ImageAdapter extends PagerAdapter {
         if (!file.exists()) {
             imgCloth.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.pant));
         }
-        Bitmap bitmap = GlideBitmapFactory.decodeFile(file.getPath());
+        Bitmap bitmap = GlideBitmapFactory.decodeFile(file.getPath(), 100, 100);
         if (bitmap == null)
             return view;
         imgCloth.setImageBitmap(bitmap);
@@ -100,8 +104,22 @@ public class ImageAdapter extends PagerAdapter {
         return view;
     }
 
+    /**
+     * Recycling bitmap
+     *
+     * @param container  container
+     * @param position position
+     * @param object view object
+     */
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
+        View view = (View) object;
+        ImageView imgView = (ImageView) view.findViewById(R.id.img_cloth);
+        BitmapDrawable bmpDrawable = (BitmapDrawable) imgView.getDrawable();
+        if (bmpDrawable != null && bmpDrawable.getBitmap() != null) {
+            bmpDrawable.getBitmap().recycle();
+        }
+        container.removeView(view);
         container.removeView((FrameLayout) object);
     }
 
