@@ -1,8 +1,11 @@
 package com.wardrobe.database;
 
+import android.media.Image;
+
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.structure.BaseModel;
+import com.wardrobe.model.ImageModel;
 
 /**
  * Created by hardik on 03/01/18.
@@ -38,6 +41,11 @@ public class WardrobeTable extends BaseModel {
 
     public int getIsFavourite() {
         return isFavourite;
+    }
+
+    public ImageModel getImageModel() {
+        ImageModel imageModel = new ImageModel(id,imagePath);
+        return imageModel;
     }
 
 

@@ -163,6 +163,7 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
                 where(WardrobeTable_Table.clothType.eq(isShirtSelected ?
                         WardrobeTable.ClothType.TYPE_SHIRT : WardrobeTable.ClothType.TYPE_PANT)).
                 queryList();
+        //If list is empty, we show placeholder text
         if (list.size() == 0) {
             ImageModel placeholderModel = new ImageModel(-1, null);
             if (isShirtSelected) {
@@ -172,19 +173,19 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
             wardrobeView.showPlaceholderForPant(placeholderModel);
             return;
         }
-
+        //We convert table entries to adapter view model
         ArrayList<ImageModel> imageModels = new ArrayList<>();
         for (WardrobeTable wardrobeTable : list) {
-            int id = wardrobeTable.getId();
-            String path = wardrobeTable.getImagePath();
-            ImageModel imageModel = new ImageModel(id, path);
-            imageModels.add(imageModel);
+            //Converting table entry to adapter view model
+            imageModels.add(wardrobeTable.getImageModel());
         }
+        //Identifying which view(Shirt/Pant) to bind the data
         if (isShirtSelected) {
             wardrobeView.setupShirtView(imageModels);
             return;
         }
         wardrobeView.setupPantView(imageModels);
+        //Checking if current combination is marked favourite
         checkIfFavouriteCombination(imageModels.get(0).getImageId());
     }
 
@@ -195,6 +196,8 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
      * @param pantId pantId
      */
     private void checkIfFavouriteCombination(int pantId) {
+        if (pantId == -1)
+            return;
         WardrobeTable shirtEntry = SQLite.select(WardrobeTable_Table.id).
                 from(WardrobeTable.class).
                 where(WardrobeTable_Table.clothType.eq(WardrobeTable.ClothType.TYPE_SHIRT)).
