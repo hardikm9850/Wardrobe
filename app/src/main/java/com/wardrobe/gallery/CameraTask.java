@@ -13,6 +13,7 @@ import android.widget.Toast;
 import com.darsh.multipleimageselect.models.Image;
 import com.wardrobe.R;
 import com.wardrobe.WardrobeApp;
+import com.wardrobe.gallery.util.BitmapUtils;
 import com.wardrobe.gallery.util.UriToUrl;
 
 import java.io.File;
@@ -41,7 +42,7 @@ public class CameraTask {
         intent.setData(cameraUri);
         context.sendBroadcast(intent);
         String imagePath = UriToUrl.getImagePathFromUri(cameraUri);
-        final Bitmap newBitmap = DisplayUtils.rotateImage(imagePath);
+        final Bitmap newBitmap = BitmapUtils.rotateImage(imagePath);
         if (newBitmap == null) {
             //Image is Ok
             Log.d(TAG, "Camera Image as is " + imagePath);

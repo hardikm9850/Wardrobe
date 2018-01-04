@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements WardrobeContract.
     @Override
     public void startGalleryChooser(WardrobeContract.ClothType _clothType) {
         clothType = _clothType;
-        GalleryTask.launchGallaryChooser(this, new Callback<Uri>() {
+        GalleryTask.launchGalleryChooser(this, new Callback<Uri>() {
             @Override
             public void returnResult(Uri _cameraUri) {
                 cameraUri = _cameraUri;

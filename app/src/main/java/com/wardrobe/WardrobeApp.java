@@ -24,7 +24,7 @@ public class WardrobeApp extends Application {
         Stetho.initializeWithDefaults(wardrobeApp);
         Nammu.init(wardrobeApp);
         FlowManager.init(new FlowConfig.Builder(wardrobeApp).openDatabasesOnInit(true).build());
-        GlideBitmapPool.initialize(20 * 1024 * 1024);
+        GlideBitmapPool.initialize(40 * 1024 * 1024);
     }
 
     public static Context getInstance() {

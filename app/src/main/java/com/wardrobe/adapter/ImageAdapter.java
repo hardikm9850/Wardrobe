@@ -9,12 +9,15 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.AppCompatTextView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.glidebitmappool.GlideBitmapFactory;
 import com.glidebitmappool.GlideBitmapPool;
 import com.wardrobe.R;
@@ -96,10 +99,19 @@ public class ImageAdapter extends PagerAdapter {
         if (!file.exists()) {
             imgCloth.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.pant));
         }
-        Bitmap bitmap = GlideBitmapFactory.decodeFile(file.getPath(), 100, 100);
-        if (bitmap == null)
-            return view;
-        imgCloth.setImageBitmap(bitmap);
+        //Bitmap bitmap = GlideBitmapFactory.decodeFile(file.getPath(), 100, 100);
+        //if (bitmap == null)
+        //return view;
+        //imgCloth.setImageBitmap(bitmap);
+        Glide.with(view.getContext()).
+                load(file.getPath()).
+                asBitmap().
+                dontAnimate().
+                thumbnail(0.4f).
+                //placeholder(R.drawable.pant).
+                override(200, 200).
+                skipMemoryCache(true).
+                into(imgCloth);
         container.addView(view, 0);
         return view;
     }
@@ -107,20 +119,21 @@ public class ImageAdapter extends PagerAdapter {
     /**
      * Recycling bitmap
      *
-     * @param container  container
-     * @param position position
-     * @param object view object
+     * @param container container
+     * @param position  position
+     * @param object    view object
      */
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
+        Log.d("####", "Page is being removed " + position);
         View view = (View) object;
-        ImageView imgView = (ImageView) view.findViewById(R.id.img_cloth);
+        container.removeView(view);
+
+        ImageView imgView = view.findViewById(R.id.img_cloth);
         BitmapDrawable bmpDrawable = (BitmapDrawable) imgView.getDrawable();
         if (bmpDrawable != null && bmpDrawable.getBitmap() != null) {
             bmpDrawable.getBitmap().recycle();
         }
-        container.removeView(view);
-        container.removeView((FrameLayout) object);
     }
 
     public ArrayList<ImageModel> getData() {

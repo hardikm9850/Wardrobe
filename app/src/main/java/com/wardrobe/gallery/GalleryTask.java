@@ -20,13 +20,13 @@ import pl.tajchert.nammu.Nammu;
 
 public class GalleryTask {
 
-    private static int SELECTION_LIMIT = 5;
+    private static int SELECTION_LIMIT = 15;
 
     /**
      * @param activity              activity instance
      * @param cameraUriNameCallback callback that allows stores Uri of camera image
      */
-    public static void launchGallaryChooser(final Activity activity, final Callback<Uri> cameraUriNameCallback) {
+    public static void launchGalleryChooser(final Activity activity, final Callback<Uri> cameraUriNameCallback) {
         String selectOption = "Select from Camera/Gallery";
         String camera = "Camera";
         String album = "Gallery";
