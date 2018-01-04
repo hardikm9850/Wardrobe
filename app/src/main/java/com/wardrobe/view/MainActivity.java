@@ -51,8 +51,8 @@ public class MainActivity extends AppCompatActivity implements WardrobeContract.
     private String TAG = MainActivity.class.getSimpleName();
     private Context context;
     private Uri cameraUri;
-    private boolean isAddShirtSelected = false;
     private ImageAdapter shirtAdapter, pantAdapter;
+    private WardrobeContract.ClothType clothType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,13 +77,13 @@ public class MainActivity extends AppCompatActivity implements WardrobeContract.
                 for (Image image : images) {
                     Log.d(TAG, "Image " + image.path);
                 }
-                wardrobePresenter.storeImages(images, isAddShirtSelected);
+                wardrobePresenter.storeImages(images, clothType);
             }
             break;
             case REQUEST_CAMERA: {
                 if (resultCode != RESULT_OK) return;
                 ArrayList<Image> images = CameraTask.saveCameraImageToFile(context, cameraUri);
-                wardrobePresenter.storeImages(images, isAddShirtSelected);
+                wardrobePresenter.storeImages(images, clothType);
             }
             break;
         }
@@ -96,8 +96,8 @@ public class MainActivity extends AppCompatActivity implements WardrobeContract.
     }
 
     @Override
-    public void startGalleryChooser(boolean isShirtSelected) {
-        isAddShirtSelected = isShirtSelected;
+    public void startGalleryChooser(WardrobeContract.ClothType _clothType) {
+        clothType = _clothType;
         GalleryTask.launchGallaryChooser(this, new Callback<Uri>() {
             @Override
             public void returnResult(Uri _cameraUri) {
@@ -108,12 +108,12 @@ public class MainActivity extends AppCompatActivity implements WardrobeContract.
 
     @Override
     public void setupShirtView(ArrayList<ImageModel> imageModels) {
-        shirtAdapter.setData(imageModels);
+        shirtAdapter.setData(new ArrayList<>(imageModels));
     }
 
     @Override
     public void setupPantView(ArrayList<ImageModel> imageModels) {
-        pantAdapter.setData(imageModels);
+        pantAdapter.setData(new ArrayList<>(imageModels));
     }
 
     @Override
@@ -132,7 +132,17 @@ public class MainActivity extends AppCompatActivity implements WardrobeContract.
         pantAdapter.setData(placeholderModel);
     }
 
-    @OnClick({R.id.img_add_shirt, R.id.img_add_pant, R.id.img_favourite})
+    @Override
+    public ArrayList<ImageModel> getPantAdapterList() {
+        return new ArrayList<>(pantAdapter.getData());
+    }
+
+    @Override
+    public ArrayList<ImageModel> getShirtAdapterList() {
+        return new ArrayList<>(shirtAdapter.getData());
+    }
+
+    @OnClick({R.id.img_add_shirt, R.id.img_add_pant, R.id.img_favourite, R.id.img_shuffle})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.img_add_pant: {
@@ -149,6 +159,10 @@ public class MainActivity extends AppCompatActivity implements WardrobeContract.
                 ImageModel shirtModel = shirtAdapter.getItemAtPosition(currentShirtItem);
                 ImageModel pantModel = pantAdapter.getItemAtPosition(currentPantItem);
                 wardrobePresenter.addToFavourites(shirtModel, pantModel);
+            }
+            break;
+            case R.id.img_shuffle: {
+                wardrobePresenter.onShuffleClicked();
             }
             break;
         }

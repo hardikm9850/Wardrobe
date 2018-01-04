@@ -104,4 +104,8 @@ public class ImageAdapter extends PagerAdapter {
     public void destroyItem(ViewGroup container, int position, Object object) {
         container.removeView((FrameLayout) object);
     }
+
+    public ArrayList<ImageModel> getData() {
+        return imageModels;
+    }
 }

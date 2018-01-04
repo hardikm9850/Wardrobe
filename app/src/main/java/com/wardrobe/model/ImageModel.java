@@ -38,4 +38,12 @@ public class ImageModel {
         result = 31 * result + imagePath.hashCode();
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "ImageModel{" +
+                "imageId=" + imageId +
+                ", imagePath='" + imagePath + '\'' +
+                '}';
+    }
 }

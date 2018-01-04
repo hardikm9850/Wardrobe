@@ -12,7 +12,9 @@ import com.wardrobe.database.WardrobeTable_Table;
 import com.wardrobe.model.ImageModel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 
 /**
@@ -38,25 +40,27 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
 
     @Override
     public void onAddNewShirtClicked() {
-        wardrobeView.startGalleryChooser(true);
+        wardrobeView.startGalleryChooser(WardrobeContract.ClothType.SHIRT);
     }
 
     @Override
     public void onAddNewPantClicked() {
-        wardrobeView.startGalleryChooser(false);
+        wardrobeView.startGalleryChooser(WardrobeContract.ClothType.PANT);
     }
 
 
     /**
      * Once the user has selected images from Gallery / Camera, we put them in SQlite along with the type of cloth {Shirt/Pant}
-     * @param images list of images
-     * @param isShirtSelected if cloth type if shirt or pant
+     *
+     * @param images    list of images
+     * @param clothType if cloth type if shirt or pant
      */
     @Override
-    public void storeImages(ArrayList<Image> images, boolean isShirtSelected) {
+    public void storeImages(ArrayList<Image> images, WardrobeContract.ClothType clothType) {
         int TYPE_SHIRT = WardrobeTable.ClothType.TYPE_SHIRT;
         int TYPE_PANT = WardrobeTable.ClothType.TYPE_PANT;
         int IS_FAVOURITE = WardrobeTable.InFavourite.NO;
+        boolean isShirtSelected = clothType.equals(WardrobeContract.ClothType.SHIRT);
 
         if (images == null)
             return;
@@ -74,8 +78,9 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
     /**
      * User has added current combination to his liked/favourite section
      * We put this entry in favourite table
+     *
      * @param shirtModel model object representing shirt obj
-     * @param pantModel model object representing pant obj
+     * @param pantModel  model object representing pant obj
      */
     @Override
     public void addToFavourites(ImageModel shirtModel, ImageModel pantModel) {
@@ -93,8 +98,9 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
     /**
      * On every viewpager change event we check if current combination is added in favourites
      * If yes then we show the favourite icon, dislike otherwise
+     *
      * @param shirtModel model object representing shirt obj
-     * @param pantModel model object representing pant obj
+     * @param pantModel  model object representing pant obj
      */
     @Override
     public void onPageChanged(ImageModel shirtModel, ImageModel pantModel) {
@@ -114,6 +120,28 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
         }
     }
 
+    @Override
+    public void onShuffleClicked() {
+        int pantId = -1;
+        ArrayList<ImageModel> shirtModels = wardrobeView.getShirtAdapterList();
+        ArrayList<ImageModel> pantModels = wardrobeView.getPantAdapterList();
+        if (shirtModels != null) {
+            Collections.shuffle(shirtModels);
+        }
+        if (pantModels != null) {
+            Collections.shuffle(pantModels);
+        }
+        assert shirtModels != null;
+        wardrobeView.setupShirtView(new ArrayList<>(shirtModels));
+        assert pantModels != null;
+        wardrobeView.setupPantView(new ArrayList<>(pantModels));
+
+        if (pantModels.size() > 0) {
+            pantId = pantModels.get(0).getImageId();
+        }
+        checkIfFavouriteCombination(pantId);
+    }
+
     private void setDataForShirts() {
         setDataForViews(true);
     }
@@ -124,6 +152,7 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
 
     /**
      * Fetches the stored image path of shirt/pant from SQlite and pass this list to View
+     *
      * @param isShirtSelected boolean indication type of clothes images we want to provide to views
      */
     private void setDataForViews(boolean isShirtSelected) {
@@ -162,6 +191,7 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
     /**
      * Checks if first visible combination of shirt and pant(if available) are user's favourite
      * We fetch first shirt id and check if favourite table has this <shirtId,pantId> pair
+     *
      * @param pantId pantId
      */
     private void checkIfFavouriteCombination(int pantId) {
@@ -180,6 +210,8 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
                 and(FavouriteTable_Table.pantId.eq(pantId)).querySingle();
         if (favouriteTable != null) {
             wardrobeView.changeFavouriteState(R.drawable.ic_like);
+        } else {
+            wardrobeView.changeFavouriteState(R.drawable.ic_dis_like);
         }
     }
 }
