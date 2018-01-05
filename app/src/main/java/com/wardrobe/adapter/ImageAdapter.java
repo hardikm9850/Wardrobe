@@ -28,6 +28,7 @@ import com.glidebitmappool.GlideBitmapFactory;
 import com.glidebitmappool.GlideBitmapPool;
 import com.glidebitmappool.internal.BitmapPool;
 import com.wardrobe.R;
+import com.wardrobe.database.WardrobeTable;
 import com.wardrobe.model.ImageModel;
 
 import java.io.File;
@@ -47,7 +48,7 @@ public class ImageAdapter extends PagerAdapter {
     @BindView(R.id.txt_placeholder)
     AppCompatTextView txtPlaceholder;
 
-    private ArrayList<ImageModel> imageModels;
+    private ArrayList<WardrobeTable> imageModels;
     private Context context;
 
     public ImageAdapter(Context _context) {
@@ -55,14 +56,14 @@ public class ImageAdapter extends PagerAdapter {
         this.imageModels = new ArrayList<>();
     }
 
-    public void setData(ArrayList<ImageModel> _imageModels) {
+    public void setData(ArrayList<WardrobeTable> _imageModels) {
         this.imageModels.clear();
         this.imageModels = _imageModels;
         notifyDataSetChanged();
     }
 
 
-    public void setData(ImageModel _imageModel) {
+    public void setData(WardrobeTable _imageModel) {
         this.imageModels.add(_imageModel);
         notifyDataSetChanged();
     }
@@ -82,7 +83,7 @@ public class ImageAdapter extends PagerAdapter {
         return view == ((FrameLayout) object);
     }
 
-    public ImageModel getItemAtPosition(int position) {
+    public WardrobeTable getItemAtPosition(int position) {
         if (imageModels.size() == 0)
             return null;
         if (position > imageModels.size())
@@ -134,7 +135,7 @@ public class ImageAdapter extends PagerAdapter {
         Glide.clear(view);
     }
 
-    public ArrayList<ImageModel> getData() {
+    public ArrayList<WardrobeTable> getData() {
         return imageModels;
     }
 }

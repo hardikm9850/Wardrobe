@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.wardrobe.R;
@@ -39,10 +40,14 @@ public class FavouritesActivity extends AppCompatActivity {
     private void setupViews() {
         toolbar.setTitle(getString(R.string.favourites));
         setSupportActionBar(toolbar);
+        List<FavouriteTable> list = SQLite.select().from(FavouriteTable.class).queryList();
+        if(list.size()==0){
+            recyclerFavourites.setVisibility(View.GONE);
+            return;
+        }
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerFavourites.setLayoutManager(linearLayoutManager);
-        List<FavouriteTable> list = SQLite.select().from(FavouriteTable.class).queryList();
         FavouritesAdapter favouritesAdapter = new FavouritesAdapter(this, list);
         recyclerFavourites.setAdapter(favouritesAdapter);
     }

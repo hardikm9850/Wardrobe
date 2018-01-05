@@ -16,6 +16,7 @@ import pl.tajchert.nammu.Nammu;
 
 public class WardrobeApp extends Application {
     private static Context wardrobeApp;
+    public static final String TAG_ALARM_NOTIFIER = "Alarm_notifier";
 
     @Override
     public void onCreate() {

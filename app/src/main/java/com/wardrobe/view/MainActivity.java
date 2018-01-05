@@ -25,6 +25,7 @@ import com.wardrobe.R;
 import com.wardrobe.adapter.ImageAdapter;
 import com.wardrobe.callback.Callback;
 import com.wardrobe.contract.WardrobeContract;
+import com.wardrobe.database.WardrobeTable;
 import com.wardrobe.gallery.CameraTask;
 import com.wardrobe.gallery.DisplayUtils;
 import com.wardrobe.gallery.GalleryTask;
@@ -32,6 +33,7 @@ import com.wardrobe.model.ImageModel;
 import com.wardrobe.presenter.WardrobePresenterImpl;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -80,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements WardrobeContract.
         viewpagerShirt.setAdapter(shirtAdapter);
         viewpagerPant.setAdapter(pantAdapter);
         wardrobePresenter = new WardrobePresenterImpl(this);
+        wardrobePresenter.shouldShowUniqueCombination(getIntent());
     }
 
     @Override
@@ -143,13 +146,13 @@ public class MainActivity extends AppCompatActivity implements WardrobeContract.
     }
 
     @Override
-    public void setupShirtView(ArrayList<ImageModel> imageModels) {
-        shirtAdapter.setData(new ArrayList<>(imageModels));
+    public void setupShirtView(List<WardrobeTable> wardobeModels) {
+        shirtAdapter.setData(new ArrayList<>(wardobeModels));
     }
 
     @Override
-    public void setupPantView(ArrayList<ImageModel> imageModels) {
-        pantAdapter.setData(new ArrayList<>(imageModels));
+    public void setupPantView(List<WardrobeTable> wardobeModels) {
+        pantAdapter.setData(new ArrayList<>(wardobeModels));
     }
 
     @Override
@@ -159,22 +162,22 @@ public class MainActivity extends AppCompatActivity implements WardrobeContract.
     }
 
     @Override
-    public void showPlaceholderForShirt(ImageModel placeholderModel) {
+    public void showPlaceholderForShirt(WardrobeTable placeholderModel) {
         shirtAdapter.setData(placeholderModel);
     }
 
     @Override
-    public void showPlaceholderForPant(ImageModel placeholderModel) {
+    public void showPlaceholderForPant(WardrobeTable placeholderModel) {
         pantAdapter.setData(placeholderModel);
     }
 
     @Override
-    public ArrayList<ImageModel> getPantAdapterList() {
+    public ArrayList<WardrobeTable> getPantAdapterList() {
         return new ArrayList<>(pantAdapter.getData());
     }
 
     @Override
-    public ArrayList<ImageModel> getShirtAdapterList() {
+    public ArrayList<WardrobeTable> getShirtAdapterList() {
         return new ArrayList<>(shirtAdapter.getData());
     }
 
@@ -192,8 +195,8 @@ public class MainActivity extends AppCompatActivity implements WardrobeContract.
             case R.id.img_favourite: {
                 int currentShirtItem = viewpagerShirt.getCurrentItem();
                 int currentPantItem = viewpagerPant.getCurrentItem();
-                ImageModel shirtModel = shirtAdapter.getItemAtPosition(currentShirtItem);
-                ImageModel pantModel = pantAdapter.getItemAtPosition(currentPantItem);
+                WardrobeTable shirtModel = shirtAdapter.getItemAtPosition(currentShirtItem);
+                WardrobeTable pantModel = pantAdapter.getItemAtPosition(currentPantItem);
                 wardrobePresenter.addToFavourites(shirtModel, pantModel);
             }
             break;
@@ -217,8 +220,8 @@ public class MainActivity extends AppCompatActivity implements WardrobeContract.
     }
 
     private void checkIfCombinationIsFavourite(int currentShirtItemPosition, int currentPantItemPosition) {
-        ImageModel pantModel = pantAdapter.getItemAtPosition(currentPantItemPosition);
-        ImageModel shirtModel = shirtAdapter.getItemAtPosition(currentShirtItemPosition);
+        WardrobeTable pantModel = pantAdapter.getItemAtPosition(currentPantItemPosition);
+        WardrobeTable shirtModel = shirtAdapter.getItemAtPosition(currentShirtItemPosition);
         wardrobePresenter.onPageChanged(shirtModel, pantModel);
     }
 

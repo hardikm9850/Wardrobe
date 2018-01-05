@@ -13,14 +13,14 @@ import butterknife.ButterKnife;
  * Created by hardik on 05/01/18.
  */
 
-public class FavouritesViewHolder extends RecyclerView.ViewHolder {
+class FavouritesViewHolder extends RecyclerView.ViewHolder {
     @BindView(R.id.img_fav_shirt)
     ImageView imgFavShirt;
     @BindView(R.id.img_fav_pant)
     ImageView imgFavPant;
 
-    public FavouritesViewHolder(View itemView) {
+    FavouritesViewHolder(View itemView) {
         super(itemView);
-        ButterKnife.bind(this,itemView);
+        ButterKnife.bind(this, itemView);
     }
 }

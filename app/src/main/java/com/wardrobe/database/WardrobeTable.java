@@ -21,6 +21,11 @@ public class WardrobeTable extends BaseModel {
     public WardrobeTable() {
     }
 
+    public WardrobeTable(int id,String imagePath){
+        this.id = id;
+        this.imagePath = imagePath;
+    }
+
     public WardrobeTable(String imagePath, int clothType, int isFavourite) {
         this.imagePath = imagePath;
         this.clothType = clothType;

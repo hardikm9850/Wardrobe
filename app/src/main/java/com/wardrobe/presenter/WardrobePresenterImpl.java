@@ -1,12 +1,14 @@
 package com.wardrobe.presenter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 
 import com.darsh.multipleimageselect.models.Image;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.wardrobe.R;
 import com.wardrobe.WardrobeApp;
+import com.wardrobe.alarm.AlarmTask;
 import com.wardrobe.contract.WardrobeContract;
 import com.wardrobe.contract.WardrobeContract.WardrobeView;
 import com.wardrobe.database.FavouriteTable;
@@ -27,21 +29,40 @@ import java.util.List;
 
 public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter {
 
-    private WardrobeView wardrobeView;
-    private List<FavouriteTable> favouriteTableList;
-    private final String PREFS_NAME = "wardrobe";
+    private final WardrobeView wardrobeView;
     private final String PREFS_TOUR = "is_tour_pending";
-    private SharedPreferences sharedPreferences;
+    private final SharedPreferences sharedPreferences;
+    private List<FavouriteTable> favouriteTableList;
+    private final int UNAVAILABLE = -1;
 
     public WardrobePresenterImpl(WardrobeView _wardrobeView) {
         this.wardrobeView = _wardrobeView;
+        String PREFS_NAME = "wardrobe";
         sharedPreferences = WardrobeApp.getInstance().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         setDataForShirts();
         setDataForPants();
         fetchFavourites();
         checkIfAppTourIsPending();
+        shouldScheduleAlarm();
     }
 
+    /**
+     * Checks if we need to schedule the alarm that suggest user unique combination daily
+     */
+    private void shouldScheduleAlarm() {
+        String PREFS_ALARM = "is_alarm_set";
+        boolean isAlarmSet = sharedPreferences.getBoolean(PREFS_ALARM, false);
+        if (isAlarmSet)
+            return;
+        if (wardrobeView.getShirtAdapterList().size() > 0) {
+            AlarmTask.scheduleRepeatingAlarm(WardrobeApp.getInstance().getApplicationContext());
+            sharedPreferences.edit().putBoolean(PREFS_ALARM, true).apply();
+        }
+    }
+
+    /**
+     * Checks if user onboarding/demo is given already
+     */
     private void checkIfAppTourIsPending() {
         boolean isTourPending = sharedPreferences.getBoolean(PREFS_TOUR, true);
         if (isTourPending) {
@@ -49,20 +70,28 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
         }
     }
 
+    /**
+     * Fetches list of favourite combination of shirt and pant set by user
+     */
     private void fetchFavourites() {
         favouriteTableList = SQLite.select().from(FavouriteTable.class).queryList();
     }
 
+    /**
+     * User wants to add a new shirt, show him option to add from gallery or camera
+     */
     @Override
     public void onAddNewShirtClicked() {
         wardrobeView.startGalleryChooser(WardrobeContract.ClothType.SHIRT);
     }
 
+    /**
+     * User wants to add a new pant,-x-
+     */
     @Override
     public void onAddNewPantClicked() {
         wardrobeView.startGalleryChooser(WardrobeContract.ClothType.PANT);
     }
-
 
     /**
      * Once the user has selected images from Gallery / Camera, we put them in SQlite along with the type of cloth {Shirt/Pant}
@@ -98,12 +127,12 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
      * @param pantModel  model object representing pant obj
      */
     @Override
-    public void addToFavourites(ImageModel shirtModel, ImageModel pantModel) {
+    public void addToFavourites(WardrobeTable shirtModel, WardrobeTable pantModel) {
         if (shirtModel == null || pantModel == null)
             return;
-        int shirtId = shirtModel.getImageId();
-        int pantId = pantModel.getImageId();
-        if (shirtId == -1 || pantId == -1)
+        int shirtId = shirtModel.getId();
+        int pantId = pantModel.getId();
+        if (shirtId == UNAVAILABLE || pantId == UNAVAILABLE)
             return;
         FavouriteTable storedEntity = SQLite.
                 select().
@@ -135,7 +164,7 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
      * @param pantModel  model object representing pant obj
      */
     @Override
-    public void onPageChanged(ImageModel shirtModel, ImageModel pantModel) {
+    public void onPageChanged(WardrobeTable shirtModel, WardrobeTable pantModel) {
         if (shirtModel == null)
             return;
         if (pantModel == null)
@@ -143,7 +172,7 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
         if (favouriteTableList == null) {
             favouriteTableList = SQLite.select().from(FavouriteTable.class).queryList();
         }
-        FavouriteTable favouriteTable = new FavouriteTable(shirtModel.getImageId(), pantModel.getImageId());
+        FavouriteTable favouriteTable = new FavouriteTable(shirtModel.getId(), pantModel.getId());
         boolean isCombinationLiked = favouriteTableList.contains(favouriteTable);
         if (isCombinationLiked) {
             wardrobeView.changeFavouriteState(R.drawable.ic_like);
@@ -152,11 +181,15 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
         }
     }
 
+    /**
+     * User has clicked shuffle, we are using Collections.shuffle method to shuffle the adapter<view>list
+     * We also check if the current combination is favourite one after the list was shuffled
+     */
     @Override
     public void onShuffleClicked() {
-        int pantId = -1;
-        ArrayList<ImageModel> shirtModels = wardrobeView.getShirtAdapterList();
-        ArrayList<ImageModel> pantModels = wardrobeView.getPantAdapterList();
+        int pantId = UNAVAILABLE, shirtId = UNAVAILABLE;
+        List<WardrobeTable> shirtModels = wardrobeView.getShirtAdapterList();
+        List<WardrobeTable> pantModels = wardrobeView.getPantAdapterList();
         if (shirtModels != null) {
             Collections.shuffle(shirtModels);
         }
@@ -169,14 +202,41 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
         wardrobeView.setupPantView(new ArrayList<>(pantModels));
 
         if (pantModels.size() > 0) {
-            pantId = pantModels.get(0).getImageId();
+            pantId = pantModels.get(0).getId();
         }
-        checkIfFavouriteCombination(pantId);
+        if (shirtModels.size() > 0) {
+            shirtId = shirtModels.get(0).getId();
+        }
+        checkIfFavouriteCombination(shirtId,pantId);
     }
 
     @Override
     public void appTourComplete() {
         sharedPreferences.edit().putBoolean(PREFS_TOUR, false).apply();
+    }
+
+    @Override
+    public void shouldShowUniqueCombination(Intent intent) {
+        if (intent != null && intent.getBooleanExtra(WardrobeApp.TAG_ALARM_NOTIFIER, false)) {
+            List<WardrobeTable> shirtList = SQLite.
+                    select().
+                    from(WardrobeTable.class).
+                    where(WardrobeTable_Table.clothType.eq(WardrobeTable.ClothType.TYPE_SHIRT)).
+                    queryList();
+
+            List<WardrobeTable> pantList = SQLite.
+                    select().
+                    from(WardrobeTable.class).
+                    where(WardrobeTable_Table.clothType.eq(WardrobeTable.ClothType.TYPE_SHIRT)).
+                    queryList();
+            if (shirtList.size() == 0 || pantList.size() == 0)
+                return;
+
+            Collections.shuffle(shirtList);
+            Collections.shuffle(pantList);
+            wardrobeView.setupShirtView(shirtList);
+            wardrobeView.setupPantView(pantList);
+        }
     }
 
     private void setDataForShirts() {
@@ -202,7 +262,7 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
                 queryList();
         //If list is empty, we show placeholder text
         if (list.size() == 0) {
-            ImageModel placeholderModel = new ImageModel(-1, null);
+            WardrobeTable placeholderModel = new WardrobeTable(UNAVAILABLE, null);
             if (isShirtSelected) {
                 wardrobeView.showPlaceholderForShirt(placeholderModel);
                 return;
@@ -210,20 +270,14 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
             wardrobeView.showPlaceholderForPant(placeholderModel);
             return;
         }
-        //We convert table entries to adapter view model
-        ArrayList<ImageModel> imageModels = new ArrayList<>();
-        for (WardrobeTable wardrobeTable : list) {
-            //Converting table entry to adapter view model
-            imageModels.add(wardrobeTable.getImageModel());
-        }
         //Identifying which view(Shirt/Pant) to bind the data
         if (isShirtSelected) {
-            wardrobeView.setupShirtView(imageModels);
+            wardrobeView.setupShirtView(list);
             return;
         }
-        wardrobeView.setupPantView(imageModels);
+        wardrobeView.setupPantView(list);
         //Checking if current combination is marked favourite
-        checkIfFavouriteCombination(imageModels.get(0).getImageId());
+        checkIfFavouriteCombination(UNAVAILABLE, list.get(0).getId());
     }
 
     /**
@@ -231,19 +285,21 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
      * We fetch first shirt id and check if favourite table has this <shirtId,pantId> pair
      *
      * @param pantId pantId
+     * @param shirtId shirtId
      */
-    private void checkIfFavouriteCombination(int pantId) {
-        if (pantId == -1)
+    private void checkIfFavouriteCombination(int shirtId, int pantId) {
+        if (pantId == UNAVAILABLE)
             return;
-        WardrobeTable shirtEntry = SQLite.select(WardrobeTable_Table.id).
-                from(WardrobeTable.class).
-                where(WardrobeTable_Table.clothType.eq(WardrobeTable.ClothType.TYPE_SHIRT)).
-                orderBy(WardrobeTable_Table.id.asc()).
-                querySingle();
-        if (shirtEntry == null)
-            return;
-
-        int shirtId = shirtEntry.getId();
+        if (shirtId == UNAVAILABLE) {
+            WardrobeTable shirtEntry = SQLite.select(WardrobeTable_Table.id).
+                    from(WardrobeTable.class).
+                    where(WardrobeTable_Table.clothType.eq(WardrobeTable.ClothType.TYPE_SHIRT)).
+                    orderBy(WardrobeTable_Table.id.asc()).
+                    querySingle();
+            if (shirtEntry == null)
+                return;
+            shirtId = shirtEntry.getId();
+        }
         FavouriteTable favouriteTable = SQLite.select().
                 from(FavouriteTable.class).
                 where(FavouriteTable_Table.shirtId.eq(shirtId)).
