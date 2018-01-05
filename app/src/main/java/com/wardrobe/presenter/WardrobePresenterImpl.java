@@ -1,8 +1,12 @@
 package com.wardrobe.presenter;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import com.darsh.multipleimageselect.models.Image;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.wardrobe.R;
+import com.wardrobe.WardrobeApp;
 import com.wardrobe.contract.WardrobeContract;
 import com.wardrobe.contract.WardrobeContract.WardrobeView;
 import com.wardrobe.database.FavouriteTable;
@@ -25,12 +29,24 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
 
     private WardrobeView wardrobeView;
     private List<FavouriteTable> favouriteTableList;
+    private final String PREFS_NAME = "wardrobe";
+    private final String PREFS_TOUR = "is_tour_pending";
+    private SharedPreferences sharedPreferences;
 
     public WardrobePresenterImpl(WardrobeView _wardrobeView) {
         this.wardrobeView = _wardrobeView;
+        sharedPreferences = WardrobeApp.getInstance().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         setDataForShirts();
         setDataForPants();
         fetchFavourites();
+        checkIfAppTourIsPending();
+    }
+
+    private void checkIfAppTourIsPending() {
+        boolean isTourPending = sharedPreferences.getBoolean(PREFS_TOUR, true);
+        if (isTourPending) {
+            wardrobeView.provideAppTour();
+        }
     }
 
     private void fetchFavourites() {
@@ -87,11 +103,28 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
             return;
         int shirtId = shirtModel.getImageId();
         int pantId = pantModel.getImageId();
-        FavouriteTable favouriteTable = new FavouriteTable(shirtId, pantId);
-        favouriteTable.update();
-        favouriteTable.save();
-        favouriteTableList.add(favouriteTable);
-        wardrobeView.changeFavouriteState(R.drawable.ic_like);
+        if (shirtId == -1 || pantId == -1)
+            return;
+        FavouriteTable storedEntity = SQLite.
+                select().
+                from(FavouriteTable.class).
+                where(FavouriteTable_Table.shirtId.eq(shirtId)).and(FavouriteTable_Table.pantId.eq(pantId)).
+                querySingle();
+        boolean isCombinationMarkedFavourite = storedEntity != null && storedEntity.getShirtId() == shirtId;
+        wardrobeView.changeFavouriteState(isCombinationMarkedFavourite ? R.drawable.ic_dis_like : R.drawable.ic_like);
+        if (!isCombinationMarkedFavourite) {
+            String shirtPath = shirtModel.getImagePath();
+            String pantPath = pantModel.getImagePath();
+            FavouriteTable favouriteTable = new FavouriteTable(shirtId, pantId, shirtPath, pantPath);
+            favouriteTable.update();
+            favouriteTable.save();
+            favouriteTableList.add(favouriteTable);
+        } else {
+            SQLite.delete().
+                    from(FavouriteTable.class).
+                    where(FavouriteTable_Table.shirtId.eq(shirtId)).and(FavouriteTable_Table.pantId.eq(pantId)).
+                    execute();
+        }
     }
 
     /**
@@ -139,6 +172,11 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
             pantId = pantModels.get(0).getImageId();
         }
         checkIfFavouriteCombination(pantId);
+    }
+
+    @Override
+    public void appTourComplete() {
+        sharedPreferences.edit().putBoolean(PREFS_TOUR, false).apply();
     }
 
     private void setDataForShirts() {

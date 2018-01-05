@@ -9,5 +9,5 @@ import com.raizlabs.android.dbflow.annotation.Database;
 public class WardrobeDatabase {
     static final String NAME = "WardrobeDB";
 
-    static final int VERSION = 1;
+    static final int VERSION = 2;
 }

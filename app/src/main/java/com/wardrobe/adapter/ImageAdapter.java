@@ -2,6 +2,8 @@ package com.wardrobe.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.BitmapRegionDecoder;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
@@ -17,9 +19,14 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DecodeFormat;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.glidebitmappool.GlideBitmapFactory;
 import com.glidebitmappool.GlideBitmapPool;
+import com.glidebitmappool.internal.BitmapPool;
 import com.wardrobe.R;
 import com.wardrobe.model.ImageModel;
 
@@ -98,20 +105,17 @@ public class ImageAdapter extends PagerAdapter {
         File file = new File(path);
         if (!file.exists()) {
             imgCloth.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.pant));
+            container.addView(view, 0);
+            return view;
         }
-        //Bitmap bitmap = GlideBitmapFactory.decodeFile(file.getPath(), 100, 100);
-        //if (bitmap == null)
-        //return view;
-        //imgCloth.setImageBitmap(bitmap);
-        Glide.with(view.getContext()).
-                load(file.getPath()).
-                asBitmap().
-                dontAnimate().
-                thumbnail(0.4f).
-                //placeholder(R.drawable.pant).
-                override(200, 200).
-                skipMemoryCache(true).
-                into(imgCloth);
+        Glide.with(view.getContext())
+                .load(path)
+                .asBitmap()
+                .placeholder(R.drawable.shirt)
+                .dontAnimate()
+                .thumbnail(0.2f)
+                .override(150, 150)
+                .into(imgCloth);
         container.addView(view, 0);
         return view;
     }
@@ -125,15 +129,9 @@ public class ImageAdapter extends PagerAdapter {
      */
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
-        Log.d("####", "Page is being removed " + position);
         View view = (View) object;
         container.removeView(view);
-
-        ImageView imgView = view.findViewById(R.id.img_cloth);
-        BitmapDrawable bmpDrawable = (BitmapDrawable) imgView.getDrawable();
-        if (bmpDrawable != null && bmpDrawable.getBitmap() != null) {
-            bmpDrawable.getBitmap().recycle();
-        }
+        Glide.clear(view);
     }
 
     public ArrayList<ImageModel> getData() {

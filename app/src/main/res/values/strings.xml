@@ -4,5 +4,6 @@
     <string name="media_permission">Please allow Storage access to save the image</string>
     <string name="error_occured">Something went Wrong, Please try again</string>
     <string name="placeholder_text">Add T-Shirt or pant from gallery or camera to begin</string>
+    <string name="favourites">Favourites</string>
 
 </resources>

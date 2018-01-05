@@ -24,6 +24,8 @@ public interface WardrobeContract {
     }
 
     interface WardrobeView {
+        void provideAppTour();
+
         void startGalleryChooser(ClothType clothType);
 
         void setupShirtView(ArrayList<ImageModel> imageModels);
@@ -39,6 +41,7 @@ public interface WardrobeContract {
         ArrayList<ImageModel> getPantAdapterList();
 
         ArrayList<ImageModel> getShirtAdapterList();
+
     }
 
     interface WardrobePresenter {
@@ -53,5 +56,7 @@ public interface WardrobeContract {
         void onPageChanged(ImageModel shirtModel, ImageModel pantModel);
 
         void onShuffleClicked();
+
+        void appTourComplete();
     }
 }

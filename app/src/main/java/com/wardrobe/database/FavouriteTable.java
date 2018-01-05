@@ -13,6 +13,16 @@ public class FavouriteTable extends BaseModel {
     int id;
     int shirtId;
     int pantId;
+    String shirtPath;
+    String pantPath;
+
+
+    public FavouriteTable(int shirtId, int pantId, String shirtPath, String pantPath) {
+        this.shirtId = shirtId;
+        this.pantId = pantId;
+        this.shirtPath = shirtPath;
+        this.pantPath = pantPath;
+    }
 
     public FavouriteTable() {
 
@@ -21,6 +31,15 @@ public class FavouriteTable extends BaseModel {
     public FavouriteTable(int shirtId, int pantId) {
         this.shirtId = shirtId;
         this.pantId = pantId;
+    }
+
+
+    public String getShirtPath() {
+        return shirtPath;
+    }
+
+    public String getPantPath() {
+        return pantPath;
     }
 
     @Override
@@ -39,5 +58,13 @@ public class FavouriteTable extends BaseModel {
         result = 31 * result + shirtId;
         result = 31 * result + pantId;
         return result;
+    }
+
+    public int getShirtId() {
+        return shirtId;
+    }
+
+    public int getPantId() {
+        return pantId;
     }
 }

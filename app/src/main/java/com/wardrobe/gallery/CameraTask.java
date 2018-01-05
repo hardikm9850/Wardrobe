@@ -20,14 +20,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 
-import static com.wardrobe.gallery.util.FileUtils.DIRECTORY_NAME;
-
 /**
  * Created by hardik on 04/10/17.
  */
 
 public class CameraTask {
     private static final String TAG = CameraTask.class.getSimpleName();
+    public static final String DIRECTORY_NAME = "Wardrobe";
 
     @NonNull
     public static ArrayList<Image> saveCameraImageToFile(@Nullable Context context, @Nullable Uri cameraUri) {
