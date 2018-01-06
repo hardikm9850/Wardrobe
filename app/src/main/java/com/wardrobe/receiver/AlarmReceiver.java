@@ -10,7 +10,7 @@ import android.support.v4.app.NotificationCompat;
 
 import com.wardrobe.R;
 import com.wardrobe.WardrobeApp;
-import com.wardrobe.view.MainActivity;
+import com.wardrobe.view.WardrobeActivity;
 
 /**
  * We use pending intent to launch the app to suggest unique combination daily passing proper data.
@@ -23,7 +23,7 @@ public class AlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent _intent) {
 
-        Intent launchIntent = new Intent(context, MainActivity.class);
+        Intent launchIntent = new Intent(context, WardrobeActivity.class);
         launchIntent.putExtra(WardrobeApp.TAG_ALARM_NOTIFIER, true);
         PendingIntent pi = PendingIntent.getActivity(context, 0, launchIntent, 0);
 

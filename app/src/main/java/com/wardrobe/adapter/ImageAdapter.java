@@ -56,14 +56,14 @@ public class ImageAdapter extends PagerAdapter {
         this.imageModels = new ArrayList<>();
     }
 
-    public void setData(ArrayList<WardrobeTable> _imageModels) {
+    public void addData(ArrayList<WardrobeTable> _imageModels) {
         this.imageModels.clear();
         this.imageModels = _imageModels;
         notifyDataSetChanged();
     }
 
 
-    public void setData(WardrobeTable _imageModel) {
+    public void addData(WardrobeTable _imageModel) {
         this.imageModels.add(_imageModel);
         notifyDataSetChanged();
     }

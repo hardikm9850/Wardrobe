@@ -43,7 +43,8 @@ import pl.tajchert.nammu.Nammu;
 import static butterknife.OnPageChange.Callback.PAGE_SELECTED;
 import static com.wardrobe.callback.CameraPermissionCallback.REQUEST_CAMERA;
 
-public class MainActivity extends AppCompatActivity implements WardrobeContract.WardrobeView {
+
+public class WardrobeActivity extends AppCompatActivity implements WardrobeContract.WardrobeView {
 
 
     @BindView(R.id.viewpager_shirt)
@@ -83,6 +84,12 @@ public class MainActivity extends AppCompatActivity implements WardrobeContract.
         wardrobePresenter.shouldShowUniqueCombination(getIntent());
     }
 
+    /**
+     * Provides image path list from either camera or gallery
+     * @param requestCode
+     * @param resultCode
+     * @param data
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -102,12 +109,21 @@ public class MainActivity extends AppCompatActivity implements WardrobeContract.
         }
     }
 
+    /**
+     * Camera/Write permission
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         Nammu.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
+    /**
+     * provides basic app tour i.e showing user how shirt and pant can be added
+     */
     @Override
     public void provideAppTour() {
         DisplayUtils.showTutorial(activity, imgAddShirt, "Add your T-Shirts", "Choose and add your cool T-Shirts by clicking here", shirtCallback);
@@ -131,7 +147,10 @@ public class MainActivity extends AppCompatActivity implements WardrobeContract.
         }
     };
 
-
+    /**
+     * Launches a dialog to allow user select image/s
+     * @param _clothType clothtype {T-shirt,pant}
+     */
     @Override
     public void startGalleryChooser(WardrobeContract.ClothType _clothType) {
         clothType = _clothType;
@@ -143,42 +162,71 @@ public class MainActivity extends AppCompatActivity implements WardrobeContract.
         });
     }
 
+    /**
+     * Setting adapter models
+     * @param wardrobeModels adapter models
+     */
     @Override
-    public void setupShirtView(List<WardrobeTable> wardobeModels) {
-        shirtAdapter.setData(new ArrayList<>(wardobeModels));
+    public void setupShirtView(List<WardrobeTable> wardrobeModels) {
+        shirtAdapter.addData(new ArrayList<>(wardrobeModels));
     }
 
+    /**
+     * Setting adapter models
+     * @param wardrobeModels adapter models
+     */
     @Override
-    public void setupPantView(List<WardrobeTable> wardobeModels) {
-        pantAdapter.setData(new ArrayList<>(wardobeModels));
+    public void setupPantView(List<WardrobeTable> wardrobeModels) {
+        pantAdapter.addData(new ArrayList<>(wardrobeModels));
     }
 
+    /**
+     * Changes favourite state of current visible combination
+     * @param resource resourceId to set to favourite icon
+     */
     @Override
     public void changeFavouriteState(@IntegerRes int resource) {
         Drawable drawable = ContextCompat.getDrawable(context, resource);
         imgFavourite.setBackground(drawable);
     }
 
+    /**
+     * User has not added any cloth, hence we show simple placeholder
+     * @param placeholderModel placeholder model for adapter
+     */
     @Override
     public void showPlaceholderForShirt(WardrobeTable placeholderModel) {
-        shirtAdapter.setData(placeholderModel);
+        shirtAdapter.addData(placeholderModel);
     }
 
     @Override
     public void showPlaceholderForPant(WardrobeTable placeholderModel) {
-        pantAdapter.setData(placeholderModel);
+        pantAdapter.addData(placeholderModel);
     }
 
+    /**
+     * provides adapter model list to presenter for shuffling for instance
+     * @return adapter model list
+     */
     @Override
     public ArrayList<WardrobeTable> getPantAdapterList() {
         return new ArrayList<>(pantAdapter.getData());
     }
 
+    /**
+     * provides adapter model list to presenter
+     * @return adapter model list
+     */
     @Override
     public ArrayList<WardrobeTable> getShirtAdapterList() {
         return new ArrayList<>(shirtAdapter.getData());
     }
 
+
+    /**
+     * Click listener for actionable views
+     * @param view view
+     */
     @OnClick({R.id.img_add_shirt, R.id.img_add_pant, R.id.img_favourite, R.id.img_shuffle})
     public void onClick(View view) {
         switch (view.getId()) {
@@ -205,6 +253,10 @@ public class MainActivity extends AppCompatActivity implements WardrobeContract.
         }
     }
 
+    /**
+     * viewpager page listener that provides current item index of viewpager
+     * @param currentShirtItemPosition current item index
+     */
     @OnPageChange(value = R.id.viewpager_shirt, callback = PAGE_SELECTED)
     public void onShirtChangeListener(int currentShirtItemPosition) {
         int currentPantItemPosition = viewpagerPant.getCurrentItem();
@@ -217,6 +269,11 @@ public class MainActivity extends AppCompatActivity implements WardrobeContract.
         checkIfCombinationIsFavourite(currentShirtItemPosition, currentPantItemPosition);
     }
 
+    /**
+     * checks if current combination of clothes is marked as favourite
+     * @param currentShirtItemPosition shirt index
+     * @param currentPantItemPosition pant index
+     */
     private void checkIfCombinationIsFavourite(int currentShirtItemPosition, int currentPantItemPosition) {
         WardrobeTable pantModel = pantAdapter.getItemAtPosition(currentPantItemPosition);
         WardrobeTable shirtModel = shirtAdapter.getItemAtPosition(currentShirtItemPosition);
@@ -229,6 +286,11 @@ public class MainActivity extends AppCompatActivity implements WardrobeContract.
         return super.onCreateOptionsMenu(menu);
     }
 
+    /**
+     * Launches favourite combination added by user
+     * @param item menu item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
