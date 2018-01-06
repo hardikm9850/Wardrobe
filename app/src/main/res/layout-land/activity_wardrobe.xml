@@ -7,6 +7,7 @@
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
+        style="@style/ToolbarTheme"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:elevation="0dp" />
@@ -43,11 +44,6 @@
                 app:srcCompat="@drawable/ic_fab_add" />
         </FrameLayout>
 
-        <View
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.01"
-            android:background="@android:color/black" />
 
         <FrameLayout
             android:layout_width="0dp"

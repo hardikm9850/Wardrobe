@@ -54,7 +54,7 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
         boolean isAlarmSet = sharedPreferences.getBoolean(PREFS_ALARM, false);
         if (isAlarmSet)
             return;
-        if (wardrobeView.getShirtAdapterList().size() > 0) {
+        if (!wardrobeView.getShirtAdapterList().isEmpty()) {
             AlarmTask.scheduleRepeatingAlarm(WardrobeApp.getInstance().getApplicationContext());
             sharedPreferences.edit().putBoolean(PREFS_ALARM, true).apply();
         }
@@ -108,7 +108,7 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
 
         if (images == null)
             return;
-        if (images.size() == 0)
+        if (images.isEmpty())
             return;
         for (Image image : images) {
             String imagePath = image.path;
@@ -207,9 +207,12 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
         if (shirtModels.size() > 0) {
             shirtId = shirtModels.get(0).getId();
         }
-        checkIfFavouriteCombination(shirtId,pantId);
+        checkIfFavouriteCombination(shirtId, pantId);
     }
 
+    /**
+     * Marks app tour as complete
+     */
     @Override
     public void appTourComplete() {
         sharedPreferences.edit().putBoolean(PREFS_TOUR, false).apply();
@@ -261,13 +264,13 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
                         WardrobeTable.ClothType.TYPE_SHIRT : WardrobeTable.ClothType.TYPE_PANT)).
                 queryList();
         //If list is empty, we show placeholder text
-        if (list.size() == 0) {
+        if (list.isEmpty()) {
             WardrobeTable placeholderModel = new WardrobeTable(UNAVAILABLE, null);
             if (isShirtSelected) {
                 wardrobeView.showPlaceholderForShirt(placeholderModel);
-                return;
+            } else {
+                wardrobeView.showPlaceholderForPant(placeholderModel);
             }
-            wardrobeView.showPlaceholderForPant(placeholderModel);
             return;
         }
         //Identifying which view(Shirt/Pant) to bind the data
@@ -284,7 +287,7 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
      * Checks if first visible combination of shirt and pant(if available) are user's favourite
      * We fetch first shirt id and check if favourite table has this <shirtId,pantId> pair
      *
-     * @param pantId pantId
+     * @param pantId  pantId
      * @param shirtId shirtId
      */
     private void checkIfFavouriteCombination(int shirtId, int pantId) {

@@ -63,7 +63,6 @@ public class MainActivity extends AppCompatActivity implements WardrobeContract.
     FloatingActionButton imgShuffle;
 
     private WardrobeContract.WardrobePresenter wardrobePresenter;
-    private String TAG = MainActivity.class.getSimpleName();
     private Context context;
     private Uri cameraUri;
     private ImageAdapter shirtAdapter, pantAdapter;
@@ -237,6 +236,7 @@ public class MainActivity extends AppCompatActivity implements WardrobeContract.
             case R.id.item_favorite: {
                 Intent intent = new Intent(context, FavouritesActivity.class);
                 startActivity(intent);
+                overridePendingTransition(R.anim.enter, R.anim.exit);
             }
             break;
         }
