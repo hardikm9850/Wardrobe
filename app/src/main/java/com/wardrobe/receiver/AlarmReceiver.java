@@ -29,9 +29,9 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         Notification notification = new NotificationCompat.Builder(context)
                 .setTicker("Wardrobe")
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.drawable.ic_alarm)
                 .setContentTitle("Wardrobe")
-                .setContentText("Good morning, how about this combination we have for you today?")
+                .setContentText("Good morning, How about this combination we have for you today?")
                 .setContentIntent(pi)
                 .setAutoCancel(true)
                 .build();

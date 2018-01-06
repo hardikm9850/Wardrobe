@@ -15,12 +15,10 @@ import com.wardrobe.database.FavouriteTable;
 import com.wardrobe.database.FavouriteTable_Table;
 import com.wardrobe.database.WardrobeTable;
 import com.wardrobe.database.WardrobeTable_Table;
-import com.wardrobe.model.ImageModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Handler;
 
 
 /**
@@ -56,7 +54,7 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
         if (isAlarmSet)
             return;
         if (!wardrobeView.getShirtAdapterList().isEmpty()) {
-            AlarmTask.scheduleRepeatingAlarm(WardrobeApp.getInstance().getApplicationContext());
+            AlarmTask.scheduleRepeatingAlarmOnce(WardrobeApp.getInstance().getApplicationContext());
             sharedPreferences.edit().putBoolean(PREFS_ALARM, true).apply();
         }
     }

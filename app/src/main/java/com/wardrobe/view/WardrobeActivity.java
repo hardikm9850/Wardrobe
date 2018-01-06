@@ -109,17 +109,6 @@ public class WardrobeActivity extends AppCompatActivity implements WardrobeContr
         }
     }
 
-    /**
-     * Camera/Write permission
-     * @param requestCode
-     * @param permissions
-     * @param grantResults
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        Nammu.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
 
     /**
      * provides basic app tour i.e showing user how shirt and pant can be added
@@ -303,4 +292,11 @@ public class WardrobeActivity extends AppCompatActivity implements WardrobeContr
         }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        Nammu.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
 }
