@@ -20,6 +20,7 @@ import com.wardrobe.model.ImageModel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Handler;
 
 
 /**
@@ -66,7 +67,13 @@ public class WardrobePresenterImpl implements WardrobeContract.WardrobePresenter
     private void checkIfAppTourIsPending() {
         boolean isTourPending = sharedPreferences.getBoolean(PREFS_TOUR, true);
         if (isTourPending) {
-            wardrobeView.provideAppTour();
+            android.os.Handler handler = new android.os.Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    wardrobeView.provideAppTour();
+                }
+            }, 1000);
         }
     }
 

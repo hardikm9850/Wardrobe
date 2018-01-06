@@ -65,9 +65,7 @@ public class FavouritesActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            // Respond to the action bar's Up/Home button
             case android.R.id.home:
-                //NavUtils.navigateUpFromSameTask(this);
                 finish();
                 overridePendingTransition(R.anim.left_to_right, R.anim.right_to_left);
                 return true;

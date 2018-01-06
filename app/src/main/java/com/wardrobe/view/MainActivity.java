@@ -29,7 +29,6 @@ import com.wardrobe.database.WardrobeTable;
 import com.wardrobe.gallery.CameraTask;
 import com.wardrobe.gallery.DisplayUtils;
 import com.wardrobe.gallery.GalleryTask;
-import com.wardrobe.model.ImageModel;
 import com.wardrobe.presenter.WardrobePresenterImpl;
 
 import java.util.ArrayList;
